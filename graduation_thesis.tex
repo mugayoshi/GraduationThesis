@@ -1,4 +1,4 @@
-\documentclass[10pt]{jsarticle}
+\documentclass[12pt]{jsarticle}
 
 \title{動的解析による Android マルウェアの解析}
 \author{吉川無我}
@@ -17,21 +17,29 @@
 
 code.google.com が提供している既存のAndroid マルウェアの解析ツールとして androguard \cite{aguard} , droidbox \cite{dbox} の２つがある．androguard は Android アプリのコード解析を行うことで，アプリ内のクラスごとの関係を示すグラフを作り，危険だと判定した部分のみを赤く表示する．もし，マルウェアが外部から攻撃コードをダウンロードするという攻撃をする場合，静的解析では，対応することはできない．droidbox はエミュレータ上でマルウェアを動かし，データのやりとり，ファイルの読み書き，などを動的に監視することでマルウェアの挙動を解析している．しかし，droidbox はマルウェアが実際に実機でどのような挙動をするかを正確にとらえているとは限らない．なぜならマルウェアがエミュレータ上で動いているのを検知して，挙動を変える可能性もあるからだ．
 
-そこで本研究では実機における Android マルウェアの動的解析を提案する．マルウェアの実際の挙動をより詳細に調べるためには，実機でマルウェアを動かし，その挙動から解析を行う必要があるからだ．マルウェアを実機で動かしながら，ログを得ることで解析を行う．提案手法をマルウェアに適用することで，実行されたメソッド名，クラス名，引数の型名と値を得ることができる．Android アプリは APK ファイルという1つのファイルにまとめられて端末にインストールされている．その APK ファイルから Java クラスファイルを取り出して，ログを得たいメソッドを含むクラスのJava クラスファイルを書き換える．Javaクラスファイルを書き換えたマルウェアの APK ファイルを実機にインストールして動かすと，動的にログを得ることができる．それを用いてマルウェアの解析を行う．
+そこで本研究では実機における Android マルウェアの動的解析を提案する．マルウェアの実際の挙動をより詳細に調べるためには，実機でマルウェアを動かし，その挙動から解析を行う必要があるからだ．マルウェアを実機で動かしながら，ログを得ることで解析を行う．提案手法をマルウェアに適用することで，実行されたメソッド名，クラス名，引数の型名と値を得ることができる．Android アプリは APK ファイルという1つのファイルにまとめられて端末にインストールされている．その APK ファイルから Java クラスファイルを取り出して，ログを得たいメソッドを含むクラスのJava クラスファイルを書き換える．Java クラスファイルを書き換えたマルウェアの APK ファイルを実機にインストールして動かすと，動的にログを得ることができる．それを用いてマルウェアの解析を行う．
 
-本提案によりマルウェアを解析できたかを示すためにインターネットのサイトから入手した 11 個 のマルウェアを用いて 2 種類の実験を行った．1 つめの実験では，11 個の検体において，不正なコードを含むと思われるクラスのそれぞれのメソッドの始めにログを出力するようにクラスファイルを変更した．その結果，11 個中 5 個のマルウェアから，不正な挙動を表すログを得ることができた，例えば，SMS の送信や，外部からのコードの入手を示していた．2 つめの実験では，先の 11 個の検体の中の 1 つである，iMatch に対してのみ行った，1 つめの実験で行ったクラスファイルの変更に加えて，あるメソッド内でのメソッド呼び出しの情報も出力するようにした．この実験の結果として，これの攻撃手段である，SMS 送信のための Android API とそのメソッドを呼び出しているメソッドとそのクラスを特定することができた．
+本提案によりマルウェアを解析できたかを示すためにインターネットのサイトから入手した 11 個 のマルウェアを用いて 2 種類の実験を行った．1 つめの実験では，11 個の検体において，不正なコードを含むと思われるクラスのそれぞれのメソッドの始めにログを出力するようにクラスファイルを変更した．その結果，11 個中 5 個のマルウェアから，不正な挙動を表すログを得ることができた，例えば，SMS の送信や，外部からのコードの入手を示していた．2 つめの実験では，先の 11 個の検体の中の 1 つである，iMatch に対してのみ行った，1 つめの実験で行ったクラスファイルの変更に加えて，あるメソッド内でのメソッド呼び出しの情報も出力するようにした．この実験の結果として，これの攻撃手段である，SMS 送信のための Android API とそのメソッドを呼び出しているメソッドとそのクラスを特定することができた．2 つの実験を通じて提案手法により一部のマルウェアの挙動を解析することができた．
 
-本論文の構成を以下に示す．
-
+本論文の構成を以下に示す．2 章では Android 端末を標的にした悪意あるマルウェアと基本的なについて解説する．3 章では，Android アプリのマルウェアを解析している関連研究を紹介する．4 章では，マルウェアを解析するためにどのようにマルウェアの中にログコードを挿入するかについて説明する．\ref{sec:exp} 章では，提案手法をマルウェアに適用させた実験とその結果について述べる．\ref{sec:concl} 章では，まとめと今後の課題について考察する．
 
 \newpage
 
 \section{Android  を標的にしたマルウェア}
-explanation of Android
+本研究では，Android を標的にしたマルウェアの中で悪意ある Android アプリを対象とする．\ref{sec:malware} では，悪意あるアプリの挙動について，\ref{sec:andrapp} で基本的な Android アプリの構成について説明する．
 \subsection{悪意ある Android  アプリ}
+\label{sec:malware}
+悪意あるアプリ，マルウェアの挙動として，ここでは 4 つ挙げる．その１つは，遠隔操作だ．マルウェアに感染した端末は外部サーバからの命令を受け取り，実行する．つまり，この感染した端末は Bot ネットの一部になっていることになる．もう一つは，特権レベルを上げることだ．不正にマルウェア自身の特権レベルを上げるマルウェアの中には root 権限を奪うものもある．マルウェアに root 権限を奪われてしまうと，ユーザが抵抗できる余地は少ないため，悪用されると非常に危険である．マルウェアの 1 つである，AndroidDefenderは，表向きにはウイルス対策アプリとなっている．AndroidDefender が起動すると，それは感染した端末から電話をかけられなくしたり，さまざまなアプリケーションへのアクセスを制限させる．その後，AndroidDefender は端末を修復するためにユーザに大金を要求する．さらに異なるマルウェアの挙動として，個人情報の盗難が挙げられる．デスクトップ PC やノートパソコンに比べて，スマートフォンは特に，電話帳，メールなど個人情報のデータの量が多いため，攻撃者の標的になりやすいのは明らかである．銀行のアカウントのパスワードが盗まれた場合，多額の被害を生んでしまうだろう．4 つめは金銭を不正に請求するものだ．この攻撃方法として，SMS (Short Message Service) を使ったものがある．SMS を使った攻撃は，Android を標的にしたマルウェア
+ 
 
 \subsection{Android アプリの構成}
-classes.dex の説明もここ
+\label{sec:andrapp}
+1 つの Android アプリは1 つの APK ファイル (.apk) となってまとめられている．Androidのアプリを実行するためには，異なる種類の複数のファイルが必要である．例えば，AndroidManifest.xml, 画像，レイアウトファイル（png, jpg, xml, etc），classes.dex, アプリの証明書，である．これらを1 つのファイルに ZIP 形式でまとめたものが APK ファイルである．そのため，zip ファイルと同様に解凍，圧縮，中身の入れ替えができる．なぜ一つにまとめないといけないかというと，他のアプリも同じファイル名を用いているためだ．どのアプリも必ず AndroidManifest.xml と classes.dex の 2 つのファイルを持っている．そのため，これらのファイルはアプリごとにまとめて端末上にインストールされる必要性がある． そうすることで，Android OS はアプリケーションを管理することができる．
+
+AndroidManifest.xml とはアプリの基本的な情報が書かれている XML 形式のファイルである．アプリのパッケージ名，アプリが使用する権限，アプリが起動した時に最初に実行されるクラス，などが記されている． パッケージ名は OS がアプリを識別する名前である．待ち受け画面で，アイコンの下に表示される名前とは異なる．例えば，Facebook，Instagram の Android アプリの場合は com.facebook.katanaは  は com.instagram.android，となっている．一般的な使用している分には，ユーザは気にする必要がないので，使用していて目にすることはまずない．Androidのアプリは OS から権限を得ないと実行できないことがいくつもある．電話の着発信，SMS の送受信， インターネットへの接続などである．AndroidManifest.xml に記すことにより，アプリはその権限を得る．さらに，マルウェアの AndroidManifest.xml を得ることができれば，どのようなことをしようとしているのかがわかる．表向きは電話帳のデータとは関係の無いアプリであるのに，AndroidManifest.xml で電話帳へのアクセスの権限を要求していたら，何らかの不正な動きをするアプリである可能性であることが高い．このように，AndroidManifest.xml はアプリの大まかな概要を示している．
+
+classes.dex は，Android アプリの DEX コード実行ファイルである．DEX コードとは，Android 上で動く VM，Dalvik VM の中間言語だ．Android アプリの APK ファイル内には，必ず classes.dex は 1 つしか存在しないことになっている．つまり，ソースコードの全てのクラスファイルの中身が 1 つの DEX コードに変換されるということだ．Java VM も中間言語である，Java バイトコードを用いている．Javaでは，コンパイル時にクラス毎に Java バイトコードのファイル，クラスファイルが生成される．しかし，Dalvik VM では，アプリごとに DEX コードのファイル (classes.dex) が生成される．よって， Java で実装されたソースコード中のクラスとは関係なく，1 つのファイルになる．また，dex2jar \cite{d2jar} というツールにより，classes.dex を JAR 形式に変換することができる．JAR ファイルは Java バイトコードが圧縮されたファイルであるから，これを解凍することで，Android アプリのクラスファイルを手に入れることができる．本提案ではこの方法を用いてマルウェアのクラスファイルを入手した．Java ファイルあるAndroid アプリは Java で実装されているが，端末で実行される際には，Java VM とは全く異なった DEX 形式になっている．
+
 
 \newpage
 \section{関連研究}
@@ -60,7 +68,8 @@ others
 
 \newpage
 \section{実験}
-
+\label{sec:exp}
+じっけん
 \subsection{目的}
 
 \subsection{実験方法}
@@ -70,7 +79,8 @@ others
 
 \newpage
 \section{おわりに}
-
+\label{sec:concl}
+おわりに
 \subsection{まとめ}
 
 \subsection{今後の課題}
@@ -80,10 +90,12 @@ others
 \addcontentsline{toc}{section}{謝辞}
 \addcontentsline{toc}{section}{参考文献}
 \begin{thebibliography}{9}
-	\bibitem{osshare} IDC http://www.idc.com/prodserv/smartphone-os-market-share.jsp
+	\bibitem{osshare} IDC Smartphone OS Market Share, Q3 2014 \\http://www.idc.com/prodserv/smartphone-os-market-share.jsp
 	\bibitem{cisco} Cisco 2014 Annual Security Report
-	\bibitem{dissect} Yajin Zhou Xuxian jiang "Dissecting Android Malware: Characterization and Evolution" In {\it IEEE Symposium on Security and Privacy}, 2012
+	\bibitem{dissect} Yajin Zhou Xuxian jiang "Dissecting Android Malware: Characterization and Evolution" In {\it IEEE Symposium on Security and Privacy}, pages 95 - 109, 2012.
 	\bibitem{aguard} androguard https://code.google.com/p/androguard/
 	\bibitem{dbox} droidbox https://code.google.com/p/droidbox/
+	\bibitem{d2jar} dex2jar https://code.google.com/p/dex2jar/
+	\bibitem{sopho} SOPHOS Security Threat Report 2014
 \end{thebibliography}
 \end{document}
