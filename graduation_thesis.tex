@@ -1,5 +1,6 @@
 \documentclass[12pt]{jsarticle}
-
+\usepackage{ascmac}
+\usepackage[dvips]{graphicx}
 \title{動的解析による Android マルウェアの解析}
 \author{吉川無我}
 \date{\today}
@@ -26,22 +27,30 @@ code.google.com が提供している既存のAndroid マルウェアの解析�
 \newpage
 
 \section{Android  を標的にしたマルウェア}
-本研究では，Android を標的にしたマルウェアの中で，悪意ある Android アプリを対象とする．\ref{sec:malware} では，悪意あるアプリの挙動，不正な振る舞いをするためにどのような方法をとっているのかについて説明する．\ref{sec:andrapp} では，基本的な Android アプリの構成について説明する．
+本研究では，Android を標的にしたマルウェアの中で，悪意ある Android アプリを対象とする．\ref{sec:malware} では，悪意あるアプリの挙動，不正な振る舞いをするためにどのような方法をとっているのかについて説明する．また，マルウェアの例の 1 つとして，GoldDream の挙動を説明する．\ref{sec:andrapp} では，基本的な Android アプリの構成について説明する．Android アプリの概要を示している AndroidManifest.xml とアプリの実行ファイルである，classes.dex について説明する．
 \subsection{悪意ある Android  アプリ}
 \label{sec:malware}
 マルウェアの主な挙動として，個人情報の盗難と不正な金銭請求がある．個人情報に関して言えば，デスクトップ PC やノートパソコンに比べ，スマートフォンは，電話帳，メールなど個人情報のデータの量が多いため，攻撃者の標的になりやすいのは明らかである．スマートフォンでもネットサービス等で銀行口座の操作ができるため，スマートフォンのブラウザに銀行アカウントのパスワードが残っている可能性もある．もし銀行アカウントのパスワードが盗まれた場合，多額の被害を生んでしまうおそれがある．ユーザ自身の情報だけでなく，端末の情報，IMEI（端末識別番号），SIM カードの情報, GPS の位置情報なども盗まれている．金銭を不正に請求するための攻撃方法として，SMS (Short Message Service) を使ったものがある．SMS Premium Service は，ある番号へ SMS を送ることで音楽や動画などのコンテンツを買うことができるサービスである．この攻撃は Premium Service のように，マルウェアが攻撃者たちの番号へ SMS を送信することで，ユーザーに課金させる方法だ，その課金は携帯電話の料金の支払いと同時に行われ，そこで支払われた料金の一部が攻撃者たちに支払われる．ユーザはその支払い請求が来るまで SMS が送られたことに気づかない．通常の Premium Service ではユーザに支払い確認のメッセージがくるのだが，マルウェアはこれをブロックするためだ．
 
 マルウェアが先に述べたような攻撃をするための方法を 2 つ挙げる．１つは，外部からの遠隔操作だ．マルウェアは外部サーバからの命令を受け取り，実行する．あるマルウェアがインストールされると，外部のサーバから暗号化されたスクリプトを受け取り，その復号，実行するという例もある．この手法を使うと，マルウェアを検知するソフトウェアを回避することもできる．なぜなら，公式アプリストア (Google Play)  にアップロードされた時点では不正な動きをするコードをマルウェア自身は何も持っていないため，検知されないからだ．外部から得たスクリプトは DexClassLoader というクラスローダによりアプリケーションに組み込まれていないファイルを読み込むことができる．もう一つは，特権レベルを上げることだ．不正にマルウェア自身の特権レベルを上げるマルウェアの中には root 権限を奪うものもある．マルウェアに root 権限を奪われてしまうと，ユーザが抵抗できる余地は少ないため，悪用されると非常に危険である．マルウェアの 1 つである，AndroidDefenderは，表向きにはウイルス対策アプリとなっている．AndroidDefender が起動すると，それは感染した端末から電話をかけられなくしたり，さまざまなアプリケーションへのアクセスを制限させる．その後，AndroidDefender は端末を修復するためにユーザに大金を要求する．
  
+実際のマルウェアの例として，GoldDream の挙動を示す．GoldDream はSMS の受信，電話の発着信があると，バックグラウンドでユーザに気づかれることなく起動される．GoldDream はレシーバを登録することで，これらの着信が来た時に Android OS が出す通知を受け取れるようにしている．SMS を受信した際は，受信したメッセージの送り元のアドレス，内容，タイムスタンプを収集する．電話の発着信の場合も同様に，電話番号やタイムスタンプといった情報が GoldDream によって集められる．これらの情報は一度ローカルファイルに保存された後，外部のサーバへ送信される．GoldDream は外部サーバからコマンドを受け取り，実行する．サーバから受け取るコマンドは，次の ４つである．１）SMS をバックグラウンドで送信する，２）電話を発信する，３）アプリをインストール，アンインストールする，４）ファイルをサーバへアップロードする．ファイルをアップロードするコマンドは端末の情報を送信するために用いられる．
 
 \subsection{Android アプリの構成}
 \label{sec:andrapp}
 1 つの Android アプリは1 つの APK ファイル (.apk) となってまとめられている．Androidのアプリを実行するためには，異なる種類の複数のファイルが必要である．例えば，AndroidManifest.xml, 画像，レイアウトファイル（png, jpg, xml, etc），classes.dex, アプリの証明書，である．これらを1 つのファイルに ZIP 形式でまとめたものが APK ファイルである．そのため，zip ファイルと同様に解凍，圧縮，中身の入れ替えができる．なぜ一つにまとめないといけないかというと，他のアプリも同じファイル名を用いているためだ．どのアプリも必ず AndroidManifest.xml と classes.dex の 2 つのファイルを持っている．そのため，これらのファイルはアプリごとにまとめて端末上にインストールされる必要性がある． そうすることで，Android OS はアプリケーションを管理することができる．
 
-AndroidManifest.xml とはアプリの基本的な情報が書かれている XML 形式のファイルである．アプリのパッケージ名，アプリが使用する権限，アプリが起動した時に最初に実行されるクラス，などが記されている． パッケージ名は OS がアプリを識別する名前である．待ち受け画面で，アイコンの下に表示される名前とは異なる．例えば，Facebook，Instagram の Android アプリの場合は com.facebook.katanaは  は com.instagram.android，となっている．一般的な使用している分には，ユーザは気にする必要がないので，使用していて目にすることはまずない．Androidのアプリは OS から権限を得ないと実行できないことがいくつもある．電話の着発信，SMS の送受信， インターネットへの接続などである．AndroidManifest.xml に記すことにより，アプリはその権限を得る．さらに，マルウェアの AndroidManifest.xml を得ることができれば，どのようなことをしようとしているのかがわかる．表向きは電話帳のデータとは関係の無いアプリであるのに，AndroidManifest.xml で電話帳へのアクセスの権限を要求していたら，何らかの不正な動きをするアプリである可能性であることが高い．このように，AndroidManifest.xml はアプリの大まかな概要を示している．
+AndroidManifest.xml とはアプリの基本的な情報が書かれている XML 形式のファイルである．図 \ref{manif} に AndroidManifst.xml の例を示す．アプリのパッケージ名，アプリが使用する権限，アプリが起動した時に最初に実行されるクラス，などが記されている． パッケージ名は OS がアプリを識別する名前である．待ち受け画面で，アイコンの下に表示される名前とは異なる．例えば，Facebook，Instagram の Android アプリの場合は com.facebook.katanaは  は com.instagram.android，となっている．一般的に使用している分には，ユーザは気にする必要がないので，使用していてアプリのパッケージ名を目にすることはまずない．ただし，adb (Android Debug Bridge) を用いてターミナルからアプリを手動でアンインストールする場合は，パッケージ名を特定する必要がある．OS monitor という Android のシステム状況を確認できるアプリを使うと，AndroidManifest.xml を見なくても，実行中のアプリのパッケージ名を端末上で見ることができる．Androidのアプリは OS から権限を得ないと実行できないことがいくつもある．電話の着発信，SMS の送受信， インターネットへの接続などである．AndroidManifest.xml に記すことにより，アプリはその権限を得る．これらの機能をアプリで実行するためには，必ず AndroidManifest.xml に宣言しないといけない．さらに，マルウェアの AndroidManifest.xml を得ることができれば，どのようなことをしようとしているのかがわかる．表向きは電話帳のデータとは関係の無いアプリであるのに，AndroidManifest.xml で電話帳へのアクセスの権限を要求していたら，何らかの不正な動きをするアプリである可能性であることが高い．また，AndroidManifest.xml ではアプリが起動したときに最初に実行する activity を指定する必要がある．この指定が無いと Android OS はどこから実行すればよいかわからない．activity とは 1 画面を表すクラスであり，Android アプリ内で画面が変わるということは，他の activity に変わる（遷移する）ということである．画面内でボタンなどを表示させたいときは，android.Activity クラスをオーバーライドして，実装する．このように，AndroidManifest.xml はアプリの大まかな概要を示している．
 
-classes.dex は，Android アプリの DEX コード実行ファイルである．DEX コードとは，Android 上で動く VM，Dalvik VM の中間言語だ．Android アプリの APK ファイル内には，必ず classes.dex は 1 つしか存在しないことになっている．つまり，ソースコードの全てのクラスファイルの中身が 1 つの DEX コードに変換されるということだ．Java VM も中間言語である，Java バイトコードを用いている．Javaでは，コンパイル時にクラス毎に Java バイトコードのファイル，クラスファイルが生成される．しかし，Dalvik VM では，アプリごとに DEX コードのファイル (classes.dex) が生成される．よって， Java で実装されたソースコード中のクラスとは関係なく，1 つのファイルになる．また，dex2jar \cite{d2jar} というツールにより，classes.dex を JAR 形式に変換することができる．JAR ファイルは Java バイトコードが圧縮されたファイルであるから，これを解凍することで，Android アプリのクラスファイルを手に入れることができる．本提案ではこの方法を用いてマルウェアのクラスファイルを入手した．Java ファイルあるAndroid アプリは Java で実装されているが，端末で実行される際には，Java VM とは全く異なった DEX 形式になっている．
+\begin{figure}[t]
+\begin{center}
+\includegraphics[ width= 125mm]{manifest2.eps}
+\end{center}
+\caption{AndroidManifest.xml の例}
+\label{manif}
+\end{figure}
 
+classes.dex は，Android アプリの DEX コード実行ファイルである．DEX コードとは，Android 上で動く VM，Dalvik VM の中間言語だ．Android アプリの APK ファイル内には，必ず classes.dex は 1 つしか存在しないことになっている．二つ以上の .dex ファイル（例えば，classes.dex と classes1.dex）を APK ファイル内に入れることはできるが，実行するときは classes.dex のみが実行される．アプリのソースコードの全てのクラスファイルの中身が 1 つの DEX コードに変換される．Java VM も中間言語である，Java バイトコードを用いている．Javaでは，コンパイル時にクラス毎に Java バイトコードのファイル，クラスファイルが生成される．しかし，Dalvik VM では，アプリごとに DEX コードのファイル (classes.dex) が生成される．Android アプリを実装していた場合，自分が書いた Java ファイル (.java) がコンパイルされて Java クラスファイル (.class) に変換され，そのクラスファイルが 1 つの DEX コードファイルにまとめられるという流れになる．つまり， Java で実装されたソースコード中のクラスとは関係なく，1 つのファイルになる．また，dex2jar \cite{d2jar} というツールにより，classes.dex を JAR 形式に変換することができる．JAR ファイルは Java バイトコードが圧縮されたファイルであるから，これを解凍することで，Android アプリのクラスファイルを手に入れることができる．また，Android SDK が提供する dx というコマンドラインツールを用いることで，jar ファイルから DEX コードファイルを作成することもできる．本提案ではこれらの方法を用いてマルウェアのクラスファイルを入手し，そこから  classes.dex を作成した．
 
 \newpage
 \section{関連研究}
@@ -53,23 +62,20 @@ S.Poeplau らは，マルウェアの動的に外部コードの動的ローデ�
 
 L.Yan, H.Yin はマルウェアの動的解析環境 (DroidScope) を提案している．彼らは Android SDK が提供するエミュレータをベースに自分たちで手を加えて，そのエミュレータの中でマルウェアを動かしている．彼らは Android システム全体の再構築を行っている．つまり，DroidScope はハードウェア，Linux OS (Android は Linux をベースにして動作している)，Dalvik VM の 3 種類の API を提供する．DroidScope が提供する API を用いることで，Android API, Dalvik VM, Linux , さらには機械語の命令までをトレースするツールを提案している．{\it API tracer, native tracer, Dalvik instruction tracer} の 3 つである．また，これらの API に動的な taint analysis を実行することで，情報漏えいを解析するツール ({\it Taint tracker}) も提案している．彼らはこの 4 つのツールのパフォーマンス測定も行っている．元のエミュレータで実行時間を基準に，4 つのツールの実行時間を調べた．その結果，オーバーヘッドは小さいと言える結果であった．しかし，taint traker は他の 3 つのツールとくらべて大きなオーバーヘッドを示した．彼らはこれらのツールを用いて先に述べた，DroidKungFu を解析した．この解析によって，このマルウェアのルート権限を取得する方法と情報を盗み出す方法を明らかにしている．DroidKungFu だけでなく，論文中では DroidDream も解析している．DroidKungFu の場合と同様な解析を行った結果，DroidDream が端末識別番号を盗み出す方法を突き止めた．彼らの研究は実行された API，メソッドを動的に得ることで解析を行っているため，解析のためのアプローチは本研究と共通している点がある．しかし，本研究は実機で行っているのに対して，彼らの研究はエミュレータ上で行っている．もし，マルウェアがエミュレータ上で動作しているのを検知して，振る舞いを変える可能性もある．そのため，実機で解析すればマルウェアの "正常" な動作を解析することができる．
 
-Crowdroid: behavior-based malware detection system for android ?
+ここで紹介した研究には問題点が残っている．外部コードの動的ローディングの応用例として，文字列としてクラス名，メソッド名を受け取り，  reflection を通して実行することが考えられる．S.Poelau らの研究では外部コードの動的ローディングの攻撃を防ぐツールを提案したが，reflection を使うと，このツールでは検知することができない．DroidScope は動的解析のため，コードカバレッジが制限される．実行時には，1 つの実行パスしか通ることはない．L.Yan, H.Yin は実行パスを増やすために，システムコール，ネイティブ API，Dalvik メソッドなどの返り値を変えることで，異なる実行パスを実現した.symbolic execution のほうが，より良いことが考えられるが，かれらはこれを今後の課題としている．
+(Crowdroid: behavior-based malware detection system for android ?)
 
 \newpage
 \section{提案}
-
+本研究では，Android を標的にしたマルウェアの動的解析を行う．マルウェアにログコードを挿入させ，そのログを動的に得ることで解析を行う．エミュレータでは再現できないために解析できないことも，本提案では，実機でマルウェアを動かすため解析できるメリットがある．\ref{overview} では，本提案の全体の流れを説明する．\ref{placeinsert} では，ログコードをどのように挿入するかについて説明する．
 \subsection{全体の流れ}
-
-\subsection{解析手順}
+\label{overview}
 
 \subsection{ログコードの挿入箇所}
-
+\label{placeinsert}
 \subsubsection{メソッドの先頭にコードを挿入}
  
 \subsubsection{メソッド呼び出しの前後でコードを挿入}
- 
-\newpage
-\section{実装？}
 
 \newpage
 \section{実験}
@@ -103,6 +109,9 @@ Crowdroid: behavior-based malware detection system for android ?
 	\bibitem{d2jar} dex2jar https://code.google.com/p/dex2jar/
 	\bibitem{sopho} SOPHOS Security Threat Report 2014
 	\bibitem{remote ctrl} TrendLabs Security Intelligence Blog\\http://blog.trendmicro.com/trendlabs-security-intelligence/android-malware-found-to-send-remote-commands/
+	\bibitem{droiddream} Security Alert: New Android Malware -- {\it GoldDream} -- \\http://www.cs.ncsu.edu/faculty/jiang/GoldDream/
+	\bibitem {droidscope} 
+	\bibitem{dynamicload} 
 	
 \end{thebibliography}
 \end{document}
