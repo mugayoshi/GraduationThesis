@@ -140,3 +140,57 @@ public にしたままで Android の実機で実行したところ，インス�
 
 \subsection{得られたログを処理するためのプログラム}
 \label{splitscript}
+目的
+
+比較
+
+\begin{itembox}[c]{DDMS より得られたログの一部}
+\footnotesize{
+%\begin{verbatimtab}[4]
+12-17 15:07:40.063: D/(12568): CLASS: com.mj.iMatch.IMatch METHOD: onCreate args[0]:android.os.Bundle = null\\
+12-17 15:07:40.063: D/(12568): ID: 321 Before onCreate Called From onCreate In com.mj.iMatch.IMatch\\
+12-17 15:07:40.063: D/(12568): ID: 321 After onCreate Backed To onCreate In com.mj.iMatch.IMatch\\
+...\\
+12-17 15:07:40.063: D/(12568): ID: 55 After getDefaultDisplay Backed To  onCreate In com.mj.iMatch.IMatch\\
+12-17 15:07:40.063: D/(12568): CLASS: com.mj.iMatch.CommonUtils METHOD: setDisplay args[0]:android.view.Display = Display id 0: DisplayInfo{"Built-in Screen", app 1080 x 1776, real 1080 x 1920, largest app 1794 x 1701, smallest app 1080 x 1005, 60.0 fps, rotation0, density 480 (442.451 x 443.345) dpi, layerStack 0, type BUILT\_IN, FLAG\_SECURE, FLAG\_SUPPORTS\_PROTECTED\_BUFFERS}, DisplayMetrics{density=1.0, width=320, height=526, scaledDensity=1.0, xdpi=147.48367, ydpi=147.78168}, isValid=true\\
+12-17 15:07:40.063: D/(12568): ID: 688 Before getWidth Called From setDisplay In com.mj.iMatch.CommonUtils\\
+12-17 15:07:40.063: D/(12568): ID: 688 After getWidth Backed To  setDisplay In com.mj.iMatch.CommonUtils\\
+12-17 15:07:40.063: D/(12568): ID: 741 Before getHeight Called From setDisplay In com.mj.iMatch.CommonUtils\\
+12-17 15:07:40.063: D/(12568): ID: 741 After getHeight Backed To  setDisplay In com.mj.iMatch.CommonUtils\\
+12-17 15:07:40.083: D/(12568): ID: 184 Before setContentView Called From onCreate In com.mj.iMatch.IMatch\\
+12-17 15:07:40.133: D/(12568): CLASS: com.admob.android.ads.AdManager METHOD: isEmulator args[]: No Parameter\\
+12-17 15:07:40.133: D/(12568): ID: 647 Before equals Called From isEmulator In com.admob.android.ads.AdManager\\
+12-17 15:07:40.133: D/(12568): ID: 647 After equals Backed To  isEmulator In com.admob.android.ads.AdManager\\
+....\\
+12-17 15:07:40.183: D/(12568): ID: 455 Before loadPreferences Called From onResume In com.mj.iMatch.IMatch\\
+12-17 15:07:40.183: D/(12568): CLASS: com.mj.iMatch.IMatch METHOD: loadPreferences args[]: No Parameter\\
+12-17 15:07:40.183: D/(12568): ID: 12 Before getSharedPreferences Called From loadPreferences In com.mj.iMatch.IMatch\\
+12-17 15:07:40.183: D/(12568): ID: 12 After getSharedPreferences Backed To  loadPreferences In com.mj.iMatch.IMatch\\
+12-17 15:07:40.183: D/(12568): ID: 667 Before getInt Called From loadPreferences In com.mj.iMatch.IMatch\\
+12-17 15:07:40.183: D/(12568): ID: 667 After getInt Backed To  loadPreferences In com.mj.iMatch.IMatch\\
+12-17 15:07:40.183: D/(12568): ID: 455 After loadPreferences Backed To  onResume In com.mj.iMatch.IMatch\\
+%\end{verbatimtab}
+}
+\end{itembox}
+
+
+\begin{itembox}[c]{クラスごとに分けたログの一部}
+\footnotesize{
+\begin{verbatimtab}[4]
+0 CLASS com.mj.iMatch.IMatch METHOD onCreate args[0]android.os.Bundle = null
+1	 ID 321 Before onCreate Called From onCreate In com.mj.iMatch.IMatch
+2	 ID 321 After onCreate Backed To  onCreate In com.mj.iMatch.IMatch
+...
+76	 ID 455 Before loadPreferences Called From onResume In com.mj.iMatch.IMatch
+77	 CLASS com.mj.iMatch.IMatch METHOD loadPreferences args[] No Parameter
+78		 ID 12 Before getSharedPreferences Called From loadPreferences 
+In com.mj.iMatch.IMatch
+79		 ID 12 After getSharedPreferences Backed To  loadPreferences 
+In com.mj.iMatch.IMatch
+80		 ID 667 Before getInt Called From loadPreferences In com.mj.iMatch.IMatch
+81		 ID 667 After getInt Backed To  loadPreferences In com.mj.iMatch.IMatch
+82	 ID 455 After loadPreferences Backed To  onResume In com.mj.iMatch.IMatch
+
+\end{verbatimtab}
+}
+\end{itembox}
