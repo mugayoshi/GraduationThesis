@@ -1,7 +1,7 @@
 \section{実装}
 \label{sec:instrument}
 本章では，本提案をマルウェアに適用するために実装したプログラムについて説明する．
-\ref{programforclass}では，Java ウラスファイルを書き換えるためのプログラムについて，\ref{splitscript}では，DDMS で得られたログを処理するためのプログラムについて擬似コードやソースコードを交えながらそのアルゴリズムや実行の流れを解説する．
+\ref{programforclass}では，Java ウラスファイルを書き換えるためのプログラムについて，\ref{splitscript}では，DDMS で得られたログを処理するためのプログラムについて実行の流れを解説する．
 
 \subsection{Java クラスファイルを書き換えるためのプログラム}
 \label{programforclass}
@@ -140,9 +140,29 @@ public にしたままで Android の実機で実行したところ，インス�
 
 \subsection{得られたログを処理するためのプログラム}
 \label{splitscript}
-目的
+\ref{methodtop}, と\ref{methodcalls}の手法により得られたログのテキストは，\ref{methodtop}の手法のみと比べて多くのログが出てくるため，このログを見やすくする必要がある．
+以下に示したものは\ref{methodcalls} の手法をマルウェアに適用して DDMS から得られたログのテキストの一部である．
+%コールグラフを作成するためにメソッドの呼び出し毎に固有の ID をふる．？
+\ref{methodcalls} の目的はあるメソッドの中でどのようなメソッドを呼び出したかを明らかにすることである．
+そのため，このログのテキストそのままでは解析が行いづらい．
+この中には，日付やログのタグなどの解析には必要のない情報が入っていたり，複数のクラスからのログが混在しているためである．
+よって，このログのテキストからこのような不必要な情報を除き，ログをクラス毎に分けるプログラムを実装した．
 
-比較
+このプログラムの流れを説明する．
+まず，ログのテキストファイル (.txt) を読み込む．
+そして，テキストの各行から日付，タグの情報を取り除く．
+それと同時にクラス毎に新しくテキストファイルを作成する．
+メソッドの先頭に挿入されたログはそのメソッドのクラスのファイルへ書き込み，
+メソッド呼び出しの前後に挿入されたコードはそれが呼び出されたクラスのファイルへ書き込む．
+クラス毎に振り分けたあとは，その中でのメソッド呼び出しの入れ子構造を視覚化する．
+
+
+このプログラムを用いてクラス毎に分けたログの一部を以下に示す．
+このログの 0 行目から 4 行目までは IMatch クラスの onCreate の中で実行されたメソッドを示している．
+62 行目から 82 行目では IMatch クラスの onResume メソッド内で実行されたメソッドである．
+さらに，78 行目から 81 行目を見ると，77 行目で実行された loadPreferences の中で getSharedPreferences と getInt の 2 つのメソッドが呼ばれていることがわかる．
+このようにクラス毎にログを分け，メソッド呼び出しの入れ子構造を明確にすることで，解析を行いやすくなる．
+
 
 \begin{itembox}[c]{DDMS より得られたログの一部}
 \footnotesize{
@@ -151,13 +171,9 @@ public にしたままで Android の実機で実行したところ，インス�
 12-17 15:07:40.063: D/(12568): ID: 321 Before onCreate Called From onCreate In com.mj.iMatch.IMatch\\
 12-17 15:07:40.063: D/(12568): ID: 321 After onCreate Backed To onCreate In com.mj.iMatch.IMatch\\
 ...\\
-12-17 15:07:40.063: D/(12568): ID: 55 After getDefaultDisplay Backed To  onCreate In com.mj.iMatch.IMatch\\
-12-17 15:07:40.063: D/(12568): CLASS: com.mj.iMatch.CommonUtils METHOD: setDisplay args[0]:android.view.Display = Display id 0: DisplayInfo{"Built-in Screen", app 1080 x 1776, real 1080 x 1920, largest app 1794 x 1701, smallest app 1080 x 1005, 60.0 fps, rotation0, density 480 (442.451 x 443.345) dpi, layerStack 0, type BUILT\_IN, FLAG\_SECURE, FLAG\_SUPPORTS\_PROTECTED\_BUFFERS}, DisplayMetrics{density=1.0, width=320, height=526, scaledDensity=1.0, xdpi=147.48367, ydpi=147.78168}, isValid=true\\
-12-17 15:07:40.063: D/(12568): ID: 688 Before getWidth Called From setDisplay In com.mj.iMatch.CommonUtils\\
-12-17 15:07:40.063: D/(12568): ID: 688 After getWidth Backed To  setDisplay In com.mj.iMatch.CommonUtils\\
+12-17 15:07:40.063: D/(12568): CLASS: com.mj.iMatch.CommonUtils METHOD: setDisplay args[0]:android.view.Display = Display id 0: DisplayMetrics{density=1.0, width=320, height=526, scaledDensity=1.0, xdpi=147.48367, ydpi=147.78168}, isValid=true\\
 12-17 15:07:40.063: D/(12568): ID: 741 Before getHeight Called From setDisplay In com.mj.iMatch.CommonUtils\\
 12-17 15:07:40.063: D/(12568): ID: 741 After getHeight Backed To  setDisplay In com.mj.iMatch.CommonUtils\\
-12-17 15:07:40.083: D/(12568): ID: 184 Before setContentView Called From onCreate In com.mj.iMatch.IMatch\\
 12-17 15:07:40.133: D/(12568): CLASS: com.admob.android.ads.AdManager METHOD: isEmulator args[]: No Parameter\\
 12-17 15:07:40.133: D/(12568): ID: 647 Before equals Called From isEmulator In com.admob.android.ads.AdManager\\
 12-17 15:07:40.133: D/(12568): ID: 647 After equals Backed To  isEmulator In com.admob.android.ads.AdManager\\
@@ -180,7 +196,14 @@ public にしたままで Android の実機で実行したところ，インス�
 0 CLASS com.mj.iMatch.IMatch METHOD onCreate args[0]android.os.Bundle = null
 1	 ID 321 Before onCreate Called From onCreate In com.mj.iMatch.IMatch
 2	 ID 321 After onCreate Backed To  onCreate In com.mj.iMatch.IMatch
+3	 ID 709 Before requestWindowFeature Called From onCreate In com.mj.iMatch.IMatch
+4	 ID 709 After requestWindowFeature Backed To  onCreate In com.mj.iMatch.IMatch
 ...
+61 CLASS com.mj.iMatch.IMatch METHOD onResume args[] No Parameter
+62	 ID 259 Before onResume Called From onResume In com.mj.iMatch.IMatch
+64	 ID 259 After onResume Backed To  onResume In com.mj.iMatch.IMatch
+65	 ID 812 Before getTimeVal Called From onResume In com.mj.iMatch.IMatch
+75	 ID 812 After getTimeVal Backed To  onResume In com.mj.iMatch.IMatch
 76	 ID 455 Before loadPreferences Called From onResume In com.mj.iMatch.IMatch
 77	 CLASS com.mj.iMatch.IMatch METHOD loadPreferences args[] No Parameter
 78		 ID 12 Before getSharedPreferences Called From loadPreferences 
