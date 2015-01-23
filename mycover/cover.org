@@ -1,0 +1,15 @@
+#+TITLE: 
+#+AUTHOR:61106719 情報工学 四年 上司 陽平
+#+LATEX_CLASS: mlarticle
+#+LATEX_CLASS_OPTIONS: [graduation-thesis]
+#+OPTIONS: toc:nil
+#+LATEX_HEADER: \usepackage[dvipdfmx]{color}
+#+LATEX_HEADER: \usepackage{url}
+# For includegraphics's option [H]
+#+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \usepackage[setpagesize=false]{hyperref}
+# For listing HEADER
+#+LATEX_HEADER: \usepackage{ascmac}
+#+LATEX_HEADER: \usepackage{here}
+#+LATEX_HEADER: \usepackage{txfonts}
+#+LATEX_HEADER: \usepackage{listings, jlisting}

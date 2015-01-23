@@ -1,0 +1,29 @@
+%
+%  narrow.sty for thesis  written by west
+%
+
+% Narrow itemize
+\newenvironment{narrowitemize}%
+{\begin{list}{$\bullet$}{%
+\setlength{\topsep}{-2mm}%
+\setlength{\itemsep}{-1mm}}}%
+{\end{list}
+\vspace*{1.5mm}
+}
+
+% Narrow enumerate
+%\newenvironment{narrowenumerate}%
+%{\list{\arabic{enumi}}{%
+%\usecounter{enumi}%
+%\setlength{\topsep}{-2mm}%
+%\setlength{\itemsep}{-1mm}}}%
+%\vspace*{1.5mm}
+%{\endlist}
+\newenvironment{narrowenumerate}%
+{\begin{list}{\arabic{enumi}.}{%
+\usecounter{enumi}%
+\setlength{\topsep}{-2mm}%
+\setlength{\itemsep}{-1mm}}}%
+{\end{list}
+\vspace*{1.5mm}
+}

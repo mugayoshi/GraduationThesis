@@ -1,0 +1,278 @@
+\typeout{Document Style `bthesis'.  24 Jan, 1996}
+
+\input jreport.sty
+
+\def\tableofcontents{\@restonecolfalse\if@twocolumn\@restonecoltrue\onecolumn
+ \fi\chapter*{目 次\@mkboth{}{目 次}}
+ \@starttoc{toc}\if@restonecol\twocolumn\fi}
+%\def\l@part#1#2{\addpenalty{-\@highpenalty}
+% \addvspace{2.25em plus 1pt} \begingroup
+% \@tempdima 3em \parindent \z@ \rightskip \@pnumwidth \parfillskip
+%-\@pnumwidth
+% {\large \bf \leavevmode #1\hfil \hbox to\@pnumwidth{\hss #2}}\par
+% \nobreak \endgroup}
+
+\def\l@chapter#1#2{\pagebreak[3]
+ \vskip 1.0em plus 1pt \@tempdima 1.5em \begingroup
+ \parindent \z@ \rightskip \@pnumwidth
+ \parfillskip -\@pnumwidth
+ \bf \leavevmode \advance\leftskip\@tempdima \hskip -\leftskip #1\nobreak\hfil
+\nobreak\hbox to\@pnumwidth{\hss #2}\par
+ \endgroup}
+\def\l@section{\@dottedtocline{1}{1.5em}{2.3em}}
+\def\l@subsection{\@dottedtocline{2}{3.8em}{3.2em}}
+\def\l@subsubsection{\@dottedtocline{3}{7.0em}{4.1em}}
+\def\l@paragraph{\@dottedtocline{4}{10em}{5em}}
+\def\l@subparagraph{\@dottedtocline{5}{12em}{6em}}
+\def\listoffigures{\@restonecolfalse\if@twocolumn\@restonecoltrue\onecolumn
+ \fi\chapter*{図 目 次\@mkboth
+ {}{図 目 次}}\@starttoc{lof}\if@restonecol
+ \twocolumn\fi}
+\def\l@figure{\@dottedtocline{1}{1.5em}{2.3em}}
+\def\listoftables{\@restonecolfalse\if@twocolumn\@restonecoltrue\onecolumn
+ \fi\chapter*{表 目 次\@mkboth
+ {}{表 目 次}}\@starttoc{lot}\if@restonecol
+ \twocolumn\fi}
+\let\l@table\l@figure
+
+\def\thebibliography#1{\chapter*{参考文献\@mkboth
+ {}{参 考 文 献}}\list
+ {[\arabic{enumi}]}{\settowidth\labelwidth{[#1]}\leftmargin\labelwidth
+ \advance\leftmargin\labelsep
+ \usecounter{enumi}}
+ \def\newblock{\hskip .11em plus .33em minus .07em}
+ \sloppy
+ \sfcode`\.=1000\relax}
+\let\endthebibliography=\endlist
+
+\def\fnum@figure{図 \thefigure}
+\def\fnum@table{表 \thetable}
+
+\newif\if@restonecol
+\def\theindex{\@restonecoltrue\if@twocolumn\@restonecolfalse\fi
+\columnseprule \z@
+\columnsep 35pt\twocolumn[\@makeschapterhead{索 引}]
+ \@mkboth{}{索 引}\thispagestyle{plain}\parindent\z@
+ \parskip\z@ plus .3pt\relax\let\item\@idxitem}
+\def\@idxitem{\par\hangindent 40pt}
+\def\subitem{\par\hangindent 40pt \hspace*{20pt}}
+\def\subsubitem{\par\hangindent 40pt \hspace*{30pt}}
+\def\endtheindex{\if@restonecol\onecolumn\else\clearpage\fi}
+\def\indexspace{\par \vskip 10pt plus 5pt minus 3pt\relax}
+
+\def\@chapapp{第\thechapter 章}
+
+\def\@makechapterhead#1{ \vspace*{30pt} { \parindent 0pt \raggedright
+ \ifnum \c@secnumdepth >\m@ne \huge\bf \@chapapp{} \par
+ \vskip 20pt \fi \Huge \bf #1\par
+ \nobreak \vskip 40pt } }
+
+\def\@makeschapterhead#1{ \vspace*{30pt} { \parindent 0pt \raggedright
+ \Huge \bf #1\par
+ \nobreak \vskip 40pt } }
+
+\def\chapter{\clearpage \thispagestyle{plain} \global\@topnum\z@
+\@afterindenttrue \secdef\@chapter\@schapter}
+\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+ \refstepcounter{chapter}
+ \typeout{\@chapapp}
+ \addcontentsline{toc}{chapter}{\protect
+ \numberline{\thechapter}#1}\else
+ \addcontentsline{toc}{chapter}{#1}\fi
+ \chaptermark{#1}
+ \addtocontents{lof}{\protect\addvspace{10pt}}
+\addtocontents{lot}{\protect\addvspace{10pt}} \if@twocolumn
+\@topnewpage[\@makechapterhead{#2}]
+ \else \@makechapterhead{#2}
+ \@afterheading \fi}
+\def\@schapter#1{\if@twocolumn \@topnewpage[\@makeschapterhead{#1}]
+ \else \@makeschapterhead{#1}
+ \@afterheading \fi}
+
+%\font\logofont=kiis10 scaled \magstep2
+
+\makeatletter
+\def\ps@headings{\let\@mkboth\markboth
+\def\@oddhead{$\underline{\makebox[\textwidth]{{\sl\leftmark}\hfill{\sl\rightmark}}}$}
+\def\@oddfoot{\rm\hfil\thepage\hfil}
+\def\@evenhead{$\underline{\makebox[\textwidth]{{\sl\leftmark}\hfill{\sl\rightmark}}}$}
+\def\@evenfoot{\rm\hfil\thepage\hfil}
+\def\chaptermark##1{\markboth{\ifnum\c@secnumdepth >\m@ne\thechapter.\ \fi ##1}{}}
+\def\sectionmark##1{\markright{\ifnum\c@secnumdepth >\z@\thesection.\ \fi ##1}}}
+
+\newif\if西暦\let\if西暦=\iffalse \def\西暦{\let\if西暦=\iftrue}
+\def\thisyear{{\if西暦\count0=\year\else%
+\count0=\year\advance\count0 -1989 平成\,\fi%
+\ifnum\count0=1 2\else\number\count0\fi\,年度}}
+
+\def\course#1{\gdef\@course{#1}}
+\def\courseinenglish#1{\gdef\@courseinenglish{#1}}
+\def\id#1{\gdef\@id{#1}}
+\def\author#1{\gdef\@author{#1}}
+\def\authorinkana#1{\gdef\@authorinkana{#1}}
+\def\authorinenglish#1{\gdef\@authorinenglish{#1}}
+\def\title#1{\gdef\@title{#1}}
+\def\titleinenglish#1{\gdef\@titleinenglish{#1}}
+
+\long\def\abst#1{\long\gdef\@abst{#1}}
+\long\def\jabst#1{\long\gdef\@jabst{#1}}
+%\long\def\jabstfoot#1{\long\gdef\@jabstfoot{#1}}
+\newif\if外枠\let\if外枠=\iftrue
+\long\def\noabstframe{\let\if外枠=\iffalse}
+\def\makejabstract{\begin{titlepage}
+ \oddsidemargin=0truecm
+ \evensidemargin=0truecm
+ \topmargin=0truecm
+% \textwidth=18truecm
+% \textheight=25truecm
+ \baselineskip=6mm
+ \setlength{\unitlength}{1mm}
+ \ifnum\@ptsize=2
+  \let\huge\LARGE \let\LARGE\Large \let\Large\large \let\large\normalsize
+  \let\normalsize\small \let\small\footnotesize \let\footnotesize\scriptsize
+ \fi
+ \ifnum\@ptsize=1
+  \let\small\footnotesize \let\footnotesize\scriptsize
+ \fi
+ \begin{center}
+  \begin{picture}(154,222)(0,0)
+   \normalsize
+   \if外枠 %
+   \linethickness{0.05mm}
+   \put(0,0){\linethickness{0.3mm}\framebox(154,204){}}
+   \put(  0.0,174){\line(1,0){154}}
+   \put(  0.0,193){\line(1,0){154}}
+   \put( 38.0,193){\line(0,1){11}}
+   \put( 87.5,193){\line(0,1){11}}
+   \put( 15.5,193){\dashbox(0,11){}}
+   \put( 53.5,193){\dashbox(0,11){}}
+   \put(103.0,193){\dashbox(0,11){}}
+%
+   \put(77,212){\makebox(0,0){\huge 卒~~~~業~~~~論~~~~文~~~~要~~~~旨}}
+%   \put(77,212){\makebox(0,0){\huge 修~~~~士~~~~論~~~~文~~~~要~~~~旨}}
+   \put(77, -4){\makebox(0,0){
+    慶~應~義~塾~大~学~理~工~学~部}}
+%    慶~應~義~塾~大~学~大~学~院~理~工~学~研~究~科~前~期~博~士~課~程}}
+   \put(-6,  0){\makebox(8,172)[t]{\begin{minipage}{8mm}
+    \renewcommand{\baselinestretch}{0.0}\large\normalsize
+    $\frown$\\内\\容\\の\\要\\旨\\は\\約\vspace{2pt}\\25\vspace{2pt}\\行\\程\\度\\で\\記\\入\\の\\こ\\と\\$\smile$
+    \end{minipage}}}
+%
+   \else \linethickness{0pt} \fi
+%
+\if外枠 \put(  0.0,193){\makebox(15.5,11){学~~~科}} \fi
+%\if外枠 \put(  0.0,193){\makebox(15.5,11){専~~~攻}} \fi
+        \put(15.5,193){\makebox(22.5,11){\large\bf\gt\@course }}
+\if外枠 \put( 38.0,193){\makebox(15.5,11){\shortstack{学~~~籍\\番~~~号}}}\fi
+        \put( 53.5,193){\makebox(34.0,11){\large\bf\gt\@id}}
+\if外枠 \put( 87.5,193){\makebox(15.5,11){\shortstack{
+    \footnotesize フリガナ\\ \normalsize 氏~~~名}}} \fi
+        \put(103.0,193){\makebox(51.0,11){\shortstack{{
+         \footnotesize\@authorinkana}\\ \large\bf\gt\@author}}}
+%
+\if外枠 \put(13,189){\makebox(0,0){(論~文~題~名)}} \fi
+        \put( 0,174){\makebox(154,19){\Large\bf\gt\shortstack{\@title}}}
+\if外枠 \put(15,170){\makebox(0,0){(内~容~の~要~旨)}} \fi
+   \put(0,0){\makebox(154,164)[t]{
+    \renewcommand{\baselinestretch}{1.25}\large
+    \begin{tabular}{p{135mm}}
+     \@jabst
+    \end{tabular}}}
+  \end{picture}
+ \end{center}
+\end{titlepage}}
+
+\def\makeabstract{\begin{titlepage}
+ \oddsidemargin=0truecm
+ \evensidemargin=0truecm
+ \topmargin=0truecm
+% \textwidth=18truecm
+% \textheight=25truecm
+ \baselineskip=6mm
+ \setlength{\unitlength}{1mm}
+ \ifnum\@ptsize=2
+  \let\huge\LARGE \let\LARGE\Large \let\Large\large \let\large\normalsize
+  \let\normalsize\small \let\small\footnotesize \let\footnotesize\scriptsize
+ \fi
+ \ifnum\@ptsize=1
+  \let\small\footnotesize \let\footnotesize\scriptsize
+ \fi
+ \begin{center}
+  \begin{picture}(157.5,225)(0,0.5)
+   \normalsize
+   \if外枠 %
+   \linethickness{0.05mm}
+   \put(0,0){\linethickness{0.3mm}\framebox(157.5,214.5){}}
+   \put( 0.0,180){\line(1,0){157.5}}
+   \put( 0.0,199){\line(1,0){157.5}}
+   \put( 0.0,207){\dashbox(157.5,0){}}
+   \put(63.5,199){\line(0,1){15.5}}
+   \put(96.0,199){\line(0,1){15.5}}
+%
+   \put(78.75,221.5){\makebox(0,0){\huge Summary of M. S. Thesis}}
+   \put(78.75,-6){\makebox(0,0){\shortstack{
+    \large Graduate School of Science and Technology, KEIO UNIVERSITY\\
+    \small (The summary of thesis should be written within 35 lines)}}}
+%
+   \else \linethickness{0pt} \fi
+%
+\if外枠 \put( 0.0,207){\makebox(63.5,7.5){Major}} \fi
+        \put( 0.0,199){\makebox(63.5,8.0){\large\@courseinenglish}}
+\if外枠 \put(63.5,207){\makebox(32.5,7.5){Student No.}} \fi
+        \put(63.5,199){\makebox(32.5,8.0){\large\@id}}
+\if外枠 \put(96.0,207){\makebox(61.5,7.5){SURNAME, Firstname}} \fi
+   \put(96.0,199){\makebox(61.5,8.0){\large\@authorinenglish}}
+%
+\if外枠 \put(2,180){\makebox(155.5,17)[tl]{Title}} \fi
+        \put(0,180){\makebox(157.5,15){\Large\bf\shortstack{\@titleinenglish}}}
+   \put(0,0){\makebox(157.5,175)[t]{\begin{minipage}{147mm}
+    \parindent=12pt\renewcommand{\baselinestretch}{0.9}\large\normalsize
+    \@abst
+    \end{minipage}}}
+  \end{picture}
+ \end{center}
+\end{titlepage}}
+
+\def\author#1{\gdef\@author{#1}}
+\def\id#1{\gdef\@id{#1}}
+\def\course#1{\gdef\@course{#1}}
+\def\teacher#1{\gdef\@teacher{#1}}
+\def\titletwolines#1{\gdef\@titletwolines{#1}}
+
+\def\maketitle{\begin{titlepage}
+ \let\footnotesize\small \let\footnoterule\relax \setcounter{page}{0}
+ \ifnum\@ptsize=2
+% \let\Huge\huge \let\huge\LARGE \let\LARGE\Large \normalsize\small
+ \fi
+ \null
+ \vfil
+ \begin{center}
+  \renewcommand{\baselinestretch}{1.0}\LARGE
+  \vskip -1.5cm
+  \underline{卒　業　論　文} \vskip 1.8cm
+%  \underline{修　士　論　文} \vskip 1.8cm
+  \leftline{\hspace*{1.0cm}\normalsize\underline{題　　目}} \vskip 0.5cm
+  {\bf\gt \@titletwolines}\par \vskip 1.7cm
+  \leftline{\hspace*{1.0cm}\normalsize\underline{指導教員}}
+  \@teacher \vskip 5.1cm
+  \thisyear \ifnum\@ptsize=2\vskip 3.3cm\else\vskip 3.5cm\fi
+  慶應義塾大学 理工学部 \@course 科 \vskip 1.0cm
+%  慶應義塾大学大学院 \vskip 0.7cm
+%  理工学研究科　\@course 専攻 \vskip 1.0cm
+  \@author (\@id)
+ \end{center} \par
+\@thanks
+\vfil
+%\null
+\end{titlepage}
+\setcounter{footnote}{0} \let\thanks\relax
+\let\maketitle\relax}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\appendix{
+\par
+\setcounter{chapter}{0}
+\setcounter{section}{0}
+\def\@chapapp{付録\thechapter}
+\def\thechapter{\Alph{chapter}}}
+
