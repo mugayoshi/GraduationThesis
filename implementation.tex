@@ -1,7 +1,7 @@
 \section{実装}
 \label{sec:instrument}
 本章では，本提案をマルウェアに適用するために実装したプログラムについて説明する．
-\ref{programforclass}では，Java ウラスファイルを書き換えるためのプログラムについて，\ref{splitscript}では，DDMS で得られたログを処理するためのプログラムについて実行の流れを解説する．
+\ref{programforclass}節では，Java ウラスファイルを書き換えるためのプログラムについて，\ref{splitscript}節では，DDMS で得られたログを処理するためのプログラムについて実行の流れを解説する．
 
 \subsection{Java クラスファイルを書き換えるためのプログラム}
 \label{programforclass}
@@ -48,7 +48,7 @@ jad ファイルの中身は Java ファイルと同じだが，拡張子のみ�
 メソッドの引数の実行時の値はクラスファイルを書き換えるときには分かり得ないため，特別な処理が必要である．
 そこで，メソッドの引数の値を表示するために Javassist の特殊変数を用いる．
 %insertBefore(String str) というメソッドでメソッドの先頭にコードを挿入する．．
-図\ref{insert before}は メソッドの先頭にコードを挿入する Javassist のメソッドの insertBefore の使用例である．
+図\ref{insertbefore}は メソッドの先頭にコードを挿入する Javassist のメソッドの insertBefore の使用例である．
 この図中の m は挿入するメソッドを表すオブジェクト (javassist.CtMethod) で，\$args[0], \$args[1] は， Javassist の特殊変数で，メソッドの引数を表す．
 insertBefore の引数の文字列は挿入するコードの文字列である．
 例えば，オブジェクト m が図\ref{vector}のクラス MyVector のメソッド add を表しているとする．
