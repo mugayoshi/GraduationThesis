@@ -12,7 +12,7 @@ Androgexf  に APK ファイルを入力すると，GEXF 形式のファイル (
 GEXF ファイルは Gephi というフリーソフトで見ることができる．
 このグラフはメソッドコールグラフであり，それぞれのノードには，メソッドのタイプ (activity, service, receiver etc) , クラス名，どの権限が使用されているか，その権限のレベル (それぞれの権限には，normal, signature, dangerous などのレベルがある) が記されている．
 図\ref{androguardgraph}のように，このグラフではどの部分が危険であるかを色を変えて示してあり，どのメソッドが不正な動きをしているかがグラフを見れば簡単にわかる．
-図\ref{androguardgraph}では，"MONEY\_RISK", "SMS\_RISK" というタグが付けられている．
+図\ref{androguardgraph}では，``MONEY\_RISK'', ``SMS\_RISK'' というタグが付けられている．
 これは，矢印が指されているメソッドのノード，sendSms がバックグラウンドで SMS を送るという危険があることを示している． 
 また，動的にコードをロードしているメソッドも検知することができる．
 
@@ -30,7 +30,7 @@ droidbox は，端末のネットワークデータのやりとり，ファイ�
 さらに，解析後は，マルウェアの振る舞いを表す 2 つのグラフを生成する．
 図\ref{dboxgraph1}, 図\ref{dboxgraph2}はこの 2 つのグラフである．
 図\ref{dboxgraph1}の縦軸はアプリケーションの活動の種類を表し，横軸は時間である．
-図\ref{dboxgraph1}の 横軸  30 から 40 にかけて，"net open", "leak" という activity が頻繁に発生している．
+図\ref{dboxgraph1}の 横軸  30 から 40 にかけて，``net open'',  ``leak'' という activity が頻繁に発生している．
 これはこの間に情報が流出したことを意味する．
 図\ref{dboxgraph2}は解析した複数のマルウェアの類似性を比較するために用いられる．
 それぞれの色 (CALL, FILE WRITE, NETLEAK, etc) の領域の割合を比べることで，異なるパッケージのマルウェアがどれほど似た挙動をしているかがわかる．
