@@ -42,6 +42,7 @@ Android のログのタグは自分自身で決めることができるので，
 
 \begin{figure}[t]
 \begin{center}
+\graphicspath{{./epsfiles/}}
 \includegraphics[scale=0.2]{androidlogexample.eps}
 \end{center}
 \caption{Android が出力するログの例}
@@ -122,16 +123,17 @@ if 文の中で return 文が書かれていて，ある条件ではその if �
 そうすると，メソッド A だけでなく，メソッド B のログコードも実行されなくなってしまう．
 なぜなら，メソッド B のログコードはアプリケーションを終了させる関数の後に挿入されることから，このログコードは実行されないからだ．
 もし実行フローが最後まで到達して，ログコードが実行されたとしても，解析する際には時系列とは逆の順番でログが出力されるので紛らわしくなってしまうというデメリットもある．
-メソッドの先頭へログコードを挿入する例を\ref{insertbefore}を以下に示す．
+メソッドの先頭へログコードを挿入する例の図\ref{insertbeforeexp}を以下に示す．
 こうすることで，コードが挿入されたメソッドが呼び出された場合，挿入されたコードが一番最初に実行される．
 よって，メソッドの先頭にログコードを挿入すると，メソッド内の条件等にかかわらず，必ずそのログコードが実行されることになる．
 
 \begin{figure}[t]
 \begin{center}
+\graphicspath{{./epsfiles/}}
 \includegraphics[scale=0.3]{image2.eps}
 \end{center}
 \caption{メソッドの先頭へコードを挿入する例}
-\label{insertbefore}
+\label{insertbeforeexp}
 \end{figure}
 
 メソッドの先頭に挿入するログコードではクラス名，メソッド名，そのメソッドの引数の情報を出力させる．
@@ -154,6 +156,8 @@ Javassist の API では，JVM にすでにロードされているクラスの�
 そのため，Java のプログラムが実行時（この場合，クラスファイルを書き換えようとしている時）には，JVM には java.lang.String クラスがロードされているため，Javassist は String  クラスのクラスファイルを書き換えることはできない．
 この手法を適用できないもう一つのメソッドの種類は Android API である．
 Android API は Android システムの内部に組み込まれているため，Java クラスファイルとしては存在していない．
+図\ref{structure}は Android の内部構成を表した図である．
+Android API は図\ref{structure}において，Android Runtime Layer の Core Library にあたる．
 Javassist は Android の内部に組み込まれているものを操作できないため，Javassist では，これらのメソッドの先頭にコードを挿入することはできない．
 マルウェアをより詳細に解析していくためには，メソッドの先頭へログコードの挿入は不十分である．
 この問題を解決するために， \ref{methodcalls}の手法を利用する．
@@ -172,19 +176,22 @@ Javassist は Android の内部に組み込まれているものを操作でき�
 
 \begin{figure}[t]
 \begin{center}
+\graphicspath{{./epsfiles/}}
+\includegraphics[scale=0.4]{structure2.eps}
+\end{center}
+\caption{Android の内部構成}
+\label{structure}
+\end{figure}
+
+\begin{figure}[t]
+\begin{center}
+\graphicspath{{./epsfiles/}}
 \includegraphics[scale=0.35]{image4.eps}
 \end{center}
 \caption{メソッドの前後にコードを挿入する例}
 \label{insertbetw}
 \end{figure}
 
-\begin{figure}[t]
-\begin{center}
-\includegraphics[scale=0.4]{structure2.eps}
-\end{center}
-\caption{Android の内部構成}
-\label{structure}
-\end{figure}
 
 呼び出されるメソッド呼び出しについてのログには，それ自身はもちろんのこと，呼び出し元のメソッドの情報も出力させる．
 呼び出し元のメソッドの情報はマルウェアの解析に必要である．
